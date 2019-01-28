@@ -33,11 +33,16 @@ class RemoveMentions(RemoveTokenBase):
         return s.startswith('@')
 
 
-class RemoveResponseToken (RemoveTokenBase):
+class RemoveResponseToken(RemoveTokenBase):
     def should_remove(self, s):
         return s == "RT"
 
 
-class RemoveHashtags (RemoveTokenBase):
+class RemoveHashtags(RemoveTokenBase):
     def should_remove(self, s):
         return s.startswith('#')
+
+
+class RemoveBlanks(RemoveTokenBase):
+    def should_remove(self, s):
+        return s == ""
