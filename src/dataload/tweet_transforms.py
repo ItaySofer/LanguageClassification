@@ -37,3 +37,6 @@ class RemoveResponseToken (RemoveTokenBase):
     def should_remove(self, s):
         return s == "RT"
 
+class RemoveHashtags (RemoveTokenBase):
+    def should_remove(self, s):
+        return s.startswith('#')
