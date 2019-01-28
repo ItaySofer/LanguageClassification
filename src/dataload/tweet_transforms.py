@@ -3,7 +3,6 @@ from abc import abstractmethod
 
 
 class SplitToWords(object):
-
     def __init__(self):
         pass
 
@@ -24,20 +23,17 @@ class RemoveTokenBase(object):
 
 
 class RemoveURLs(RemoveTokenBase):
-
     def should_remove(self, s):
         parseResult = urlparse(s)
         return parseResult.scheme != '' or parseResult.netloc != ''
 
 
 class RemoveMentions(RemoveTokenBase):
-
     def should_remove(self, s):
         return s.startswith('@')
 
 
 class RemoveResponseToken (RemoveTokenBase):
-
     def should_remove(self, s):
         return s == "RT"
 
