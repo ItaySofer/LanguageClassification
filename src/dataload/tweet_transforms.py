@@ -36,3 +36,16 @@ class RemoveMentions (object):
     def is_mention(s):
         return s.startswith('@')
 
+
+class RemoveResponseToken (object):
+
+    def __init__(self):
+        pass
+
+    def __call__(self, word_list):
+        return [word for word in word_list if RemoveResponseToken.is_response_token(word) is False]
+
+    @staticmethod
+    def is_response_token(s):
+        return s == "RT"
+
