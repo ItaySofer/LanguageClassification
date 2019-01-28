@@ -24,3 +24,15 @@ class RemoveURLs(object):
         return parseResult.scheme != '' or parseResult.netloc != ''
 
 
+class RemoveMentions (object):
+
+    def __init__(self):
+        pass
+
+    def __call__(self, word_list):
+        return [word for word in word_list if RemoveMentions.is_mention(word) is False]
+
+    @staticmethod
+    def is_mention(s):
+        return s.startswith('@')
+
