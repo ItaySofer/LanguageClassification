@@ -4,17 +4,11 @@ import emoji
 
 
 class SplitToWords(object):
-    def __init__(self):
-        pass
-
     def __call__(self, tweet):
         return tweet.split(" ")
 
 
 class RemoveTokenBase(object):
-    def __init__(self):
-        pass
-    
     def __call__(self, token_list):
         return [token for token in token_list if self.should_remove(token) is False]
 
