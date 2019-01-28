@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+from abc import abstractmethod
 
 
 class SplitToWords(object):
@@ -10,42 +11,33 @@ class SplitToWords(object):
         return tweet.split(" ")
 
 
-class RemoveURLs(object):
-
+class RemoveTokenBase(object):
     def __init__(self):
         pass
-
+    
     def __call__(self, word_list):
-        return [word for word in word_list if RemoveURLs.is_url(word) is False]
+        return [word for word in word_list if self.should_remove(word) is False]
 
-    @staticmethod
-    def is_url(s):
+    @abstractmethod
+    def should_remove(self, word):
+        pass
+
+
+class RemoveURLs(RemoveTokenBase):
+
+    def should_remove(self, s):
         parseResult = urlparse(s)
         return parseResult.scheme != '' or parseResult.netloc != ''
 
 
-class RemoveMentions (object):
+class RemoveMentions(RemoveTokenBase):
 
-    def __init__(self):
-        pass
-
-    def __call__(self, word_list):
-        return [word for word in word_list if RemoveMentions.is_mention(word) is False]
-
-    @staticmethod
-    def is_mention(s):
+    def should_remove(self, s):
         return s.startswith('@')
 
 
-class RemoveResponseToken (object):
+class RemoveResponseToken (RemoveTokenBase):
 
-    def __init__(self):
-        pass
-
-    def __call__(self, word_list):
-        return [word for word in word_list if RemoveResponseToken.is_response_token(word) is False]
-
-    @staticmethod
-    def is_response_token(s):
+    def should_remove(self, s):
         return s == "RT"
 
