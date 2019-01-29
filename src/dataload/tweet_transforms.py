@@ -47,7 +47,7 @@ class CleanToken(object):
         pass
 
     def __call__(self, token_list):
-        return map(CleanToken.clean, token_list)
+        return [CleanToken.clean(token) for token in token_list]
 
     @staticmethod
     def clean(token):
