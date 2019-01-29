@@ -1,12 +1,13 @@
 from torchvision import transforms
 from src.dataload.tweets_dataset import TweetsDataset
 from src.dataload.tweet_transforms import *
+from src.dataload.label_transforms import ToOneHot
 from src.model.language_classifier import LanguageClassifier
 import torch
 import torch.nn as nn
 
 
-transform = transforms.Compose(
+tweet_transform = transforms.Compose(
     [SplitToWords(),
      RemoveURLs(),
      RemoveMentions(),
@@ -15,7 +16,9 @@ transform = transforms.Compose(
      CleanToken(),
      RemoveBlanks(),
      ToLowerCase()])
-data = TweetsDataset('../data', 'it', transform)
+label_transform = ToOneHot(language_names=['en', 'es', 'fr', 'in', 'it', 'nl', 'pt', 'tl'])
+data = TweetsDataset(root_dir='../data', language_name='en',
+                     tweet_transform=tweet_transform, label_transform=label_transform)
 for i in range(10):
     print(data[i])
 
