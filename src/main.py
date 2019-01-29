@@ -37,7 +37,8 @@ tweet_transform = transforms.Compose(
      RemoveBlanks(),
      ToLowerCase()])
 label_transform = ToOneHot(language_names=language_names)
-train_data, test_data = prepare_data(language_names, tweet_transform, label_transform, train_percent=0.7)
+train_data, test_data = prepare_data(language_names=language_names, tweet_transform=tweet_transform,
+                                     label_transform=label_transform, train_percent=0.7)
 
 
 # train_dataloader = DataLoader(train_data, batch_size=1, shuffle=True)

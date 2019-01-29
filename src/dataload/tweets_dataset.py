@@ -5,12 +5,12 @@ from torch.utils.data import Dataset
 
 class TweetsDataset(Dataset):
 
-    def __init__(self, root_dir, language_name, tweet_transform=None, label_transform=None):
+    def __init__(self, root_dir, language_name, label_transform, tweet_transform=None):
         file_name = language_name + '.csv'
         file_path = os.path.join(root_dir, file_name)
         self.tweets_frame = pd.read_csv(file_path)
 
-        self.label = language_name
+        self.label = label_transform(language_name)
 
         self.tweet_transform = tweet_transform
         self.label_transform = label_transform
@@ -23,8 +23,6 @@ class TweetsDataset(Dataset):
         if self.tweet_transform:
             tweet = self.tweet_transform(tweet)
 
-        label = self.label_transform(self.label)
-
-        sample = {'tweet': tweet, 'label': label}
+        sample = {'tweet': tweet, 'label': self.label}
 
         return sample
