@@ -54,3 +54,10 @@ class CleanToken(object):
         return ''.join(c for c in token if c.isalpha())
 
 
+class ToLowerCase(object):
+    def __init__(self):
+        pass
+
+    def __call__(self, token_list):
+        return [token.lower() for token in token_list]
+

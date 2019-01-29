@@ -1,12 +1,6 @@
 from torchvision import transforms
 from src.dataload.tweets_dataset import TweetsDataset
-from src.dataload.tweet_transforms import SplitToWords
-from src.dataload.tweet_transforms import RemoveURLs
-from src.dataload.tweet_transforms import RemoveMentions
-from src.dataload.tweet_transforms import RemoveResponseToken
-from src.dataload.tweet_transforms import RemoveHashtags
-from src.dataload.tweet_transforms import RemoveBlanks
-from src.dataload.tweet_transforms import CleanToken
+from src.dataload.tweet_transforms import *
 from src.model.language_classifier import LanguageClassifier
 import torch
 import torch.nn as nn
@@ -19,8 +13,9 @@ transform = transforms.Compose(
      RemoveResponseToken(),
      RemoveHashtags(),
      CleanToken(),
-     RemoveBlanks()])
-data = TweetsDataset('../data', 'en', transform)
+     RemoveBlanks(),
+     ToLowerCase()])
+data = TweetsDataset('../data', 'it', transform)
 for i in range(10):
     print(data[i])
 
