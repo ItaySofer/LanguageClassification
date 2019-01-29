@@ -33,7 +33,7 @@ tweet_transform = transforms.Compose(
      RemoveMentions(),
      RemoveResponseToken(),
      RemoveHashtags(),
-     CleanToken(),
+     CleanTokens(),
      RemoveBlanks(),
      ToLowerCase()])
 label_transform = ToOneHot(language_names=language_names)
