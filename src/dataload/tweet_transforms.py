@@ -1,6 +1,5 @@
 from urllib.parse import urlparse
 from abc import abstractmethod
-import emoji
 
 
 class SplitToWords(object):
@@ -43,7 +42,15 @@ class RemoveBlanks(RemoveTokenBase):
         return token == ""
 
 
-class RemoveEmojis(RemoveTokenBase):
-    def should_remove(self, token):
-        return all(c in emoji.UNICODE_EMOJI for c in token)
+class CleanToken(object):
+    def __init__(self):
+        pass
+
+    def __call__(self, token_list):
+        return map(CleanToken.clean, token_list)
+
+    @staticmethod
+    def clean(token):
+        return ''.join(c for c in token if c.isalpha())
+
 
