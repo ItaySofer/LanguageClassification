@@ -1,18 +1,19 @@
+from src.config import parse_args
 from torchvision import transforms
 from src.dataload.tweets_dataset import TweetsDataset
 from src.dataload.tweet_transforms import *
 from src.dataload.label_transforms import ToOneHot
-from src.model.language_classifier import LanguageClassifier
+from src.model.model_builder import ModelBuilder
 import torch
 import torch.nn as nn
 from torch.utils.data import ConcatDataset, Subset, DataLoader
 
 
-def prepare_data(language_names, tweet_transform, label_transform, train_percent):
+def prepare_data(data_root, language_names, tweet_transform, label_transform, train_percent):
     train_datasets = []
     test_datasets = []
     for language_name in language_names:
-        dataset = TweetsDataset(root_dir='../data', language_name=language_name,
+        dataset = TweetsDataset(root_dir=data_root, language_name=language_name,
                                 tweet_transform=tweet_transform, label_transform=label_transform)
 
         train_size = int(train_percent * len(dataset))
@@ -25,7 +26,11 @@ def prepare_data(language_names, tweet_transform, label_transform, train_percent
     return ConcatDataset(train_datasets), ConcatDataset(test_datasets)
 
 
-language_names = ['en', 'es', 'fr', 'in', 'it', 'nl', 'pt', 'tl']
+config = parse_args()
+
+language_names = config['general']['langs']
+train_test_split_perc = config['training']['train_test_split']
+data_root = config['training']['data_root']
 
 tweet_transform = transforms.Compose(
     [SplitToWords(),
@@ -37,8 +42,11 @@ tweet_transform = transforms.Compose(
      RemoveBlanks(),
      ToLowerCase()])
 label_transform = ToOneHot(language_names=language_names)
-train_data, test_data = prepare_data(language_names=language_names, tweet_transform=tweet_transform,
-                                     label_transform=label_transform, train_percent=0.7)
+train_data, test_data = prepare_data(data_root=data_root,
+                                     language_names=language_names,
+                                     tweet_transform=tweet_transform,
+                                     label_transform=label_transform,
+                                     train_percent=train_test_split_perc)
 
 
 # train_dataloader = DataLoader(train_data, batch_size=1, shuffle=True)
@@ -51,7 +59,8 @@ train_data, test_data = prepare_data(language_names=language_names, tweet_transf
 #         if i == 2:
 #             break
 
-classifier = LanguageClassifier(num_of_classes=8)
+model_builder = ModelBuilder(general_config=config['general'], model_config=config['model'])
+classifier = model_builder.build()
 pred = classifier(train_data[0]['tweet'])
 
 loss = nn.CrossEntropyLoss()

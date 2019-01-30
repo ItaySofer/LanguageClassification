@@ -63,6 +63,3 @@ class MultilingualTextEmbedder(nn.Module):
 
     def embedding_length(self):
         return self.embedder.embedding_length
-
-    def __call__(self, text):
-        return self.forward(text)
