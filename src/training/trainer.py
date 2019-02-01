@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import torch.optim as optim
+from src.dataload.tweets_dataset import *
 
 
 class Trainer:
@@ -13,8 +14,8 @@ class Trainer:
 
     def start_training(self, train_dataset, test_dataset, model, epochs=50):
 
-        train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True, num_workers=16)
-        test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+        train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True, collate_fn=filter_empty_collate_fn, num_workers=16)
+        test_dataloader = DataLoader(test_dataset, batch_size=1, collate_fn=filter_empty_collate_fn, shuffle=False)
 
         optimizer = optim.Adam(model.parameters(), lr=1e-3)
         criterion = nn.CrossEntropyLoss()
@@ -58,7 +59,7 @@ class Trainer:
 
     def run_validation_epoch(self, dataloader, model, optimizer, criterion, epoch):
         # self.run_training_epoch(dataloader, model, optimizer, criterion, epoch)
-        pass    # Skip for now..
+        pass  # Skip for now..
 
     @staticmethod
     def save_model(model, base_path, epoch):

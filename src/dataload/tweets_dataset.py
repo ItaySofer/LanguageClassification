@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from torch.utils.data import Dataset
+from torch.utils.data.dataloader import default_collate
 
 
 class TweetsDataset(Dataset):
@@ -28,3 +29,8 @@ class TweetsDataset(Dataset):
         sample = {'tweet': tweet, 'label': self.label}
 
         return sample
+
+
+def filter_empty_collate_fn(batch):
+    batch = list(filter(lambda sample: sample['tweet'] is not '', batch))
+    return default_collate(batch)
