@@ -2,7 +2,7 @@ from src.config import parse_args
 from torchvision import transforms
 from src.dataload.tweets_dataset import TweetsDataset
 from src.dataload.tweet_transforms import *
-from src.dataload.label_transforms import ToLabelIdTensor
+from src.dataload.label_transforms import *
 from src.model.model_builder import ModelBuilder
 from src.training.trainer import Trainer
 import torch
@@ -53,7 +53,9 @@ tweet_transform = transforms.Compose(
      RemoveBlanks(),
      ToLowerCase(),
      JoinWordsToSentence()])
-label_transform = ToLabelIdTensor(language_names=language_names)
+label_transform = transforms.Compose(
+    [ToLabelIdTensor(language_names=language_names),
+     ToCuda()])
 train_data, test_data = prepare_data(data_root=data_root,
                                      language_names=language_names,
                                      tweet_transform=tweet_transform,
@@ -61,7 +63,7 @@ train_data, test_data = prepare_data(data_root=data_root,
                                      train_percent=train_test_split_perc)
 
 
-train_dataloader = DataLoader(train_data, batch_size=16, shuffle=True, num_workers=16)
+# train_dataloader = DataLoader(train_data, batch_size=16, shuffle=True, num_workers=16)
 # test_dataloader = DataLoader(test_data, batch_size=1, shuffle=True)
 #
 # dataloaders = [train_dataloader, test_dataloader]

@@ -19,3 +19,12 @@ class ToLabelIdTensor(object):
     def __call__(self, language_label):
         label_id = self.languages_mapping[language_label]
         return torch.tensor(label_id)
+
+
+class ToCuda(object):
+    def __init__(self):
+        pass
+
+    def __call__(self, language_label):
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        return language_label.to(device=device, dtype=torch.int64)
