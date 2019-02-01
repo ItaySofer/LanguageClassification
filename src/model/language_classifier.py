@@ -1,7 +1,5 @@
 import torch
 import torch.nn as nn
-from src.model.multilingual_text_embedder import MultilingualTextEmbedder
-from src.model.mean_aggregator import MeanAggregator
 
 
 class LanguageClassifier(nn.Module):
@@ -27,15 +25,10 @@ class LanguageClassifier(nn.Module):
 
     def forward(self, x):
         """
-        Classifies a single token or list of tokens to their respective language.
-        :param x: A single token (str) or an iterable of tokens.
-        :return: Label id of the language class identified by the classifier.
+        Classifies sentence string to it's respective language.
+        :param x: An iterable of strings, each representing a sentence.
+        :return: For each sentence - a label id of the language class identified by the classifier.
         """
-
-        # Handle both single strings as well as lists.
-        # Let the embedder block break the phrase to tokens using whitespace as a delimeter.
-        x = ' '.join(x) if not isinstance(x, str) else x
-
         token_embeddings = self.embedder(x)
         seq_embedding = self.sequence_aggregator(token_embeddings)
         y = self.projection(seq_embedding)

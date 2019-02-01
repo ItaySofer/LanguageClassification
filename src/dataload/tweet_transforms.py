@@ -7,6 +7,11 @@ class SplitToWords(object):
         return tweet.split(" ")
 
 
+class JoinWordsToSentence(object):
+    def __call__(self, token_list):
+        return ' '.join(token_list)
+
+
 class RemoveTokenBase(object):
     def __call__(self, token_list):
         return [token for token in token_list if self.should_remove(token) is False]

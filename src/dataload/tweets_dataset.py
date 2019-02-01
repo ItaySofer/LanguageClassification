@@ -23,6 +23,8 @@ class TweetsDataset(Dataset):
         if self.tweet_transform:
             tweet = self.tweet_transform(tweet)
 
+        # tweet is expected to be of basestring type, otherwise if batching is used a customized collate_fn should
+        # be specified.
         sample = {'tweet': tweet, 'label': self.label}
 
         return sample

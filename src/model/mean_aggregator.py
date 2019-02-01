@@ -7,8 +7,12 @@ class MeanAggregator(nn.Module):
         The scheme used for aggregation is "mean" over all token embeddings.
     """
 
-    def __init__(self,):
+    def __init__(self):
         super().__init__()
+
+    @staticmethod
+    def _infer_embedding_size(embeddings):
+        return list(embeddings[0].values())[0].shape[0]
 
     def forward(self, embeddings):
         """
@@ -16,11 +20,18 @@ class MeanAggregator(nn.Module):
         :param embeddings: dict of token (string) -> embedding (PyTorch tensor)
         :return: A single PyTorch tensor representing the entire sequence
         """
-        token_embeddings = [emb.unsqueeze(0) for emb in embeddings.values()]
-        token_embeddings = torch.cat(token_embeddings, dim=0)
+
+        embeddings_size = self._infer_embedding_size(embeddings)
+        mean_embeddings = torch.zeros(len(embeddings), embeddings_size)
+
+        for sentence_idx, single_entry_embeddings in enumerate(embeddings):
+            token_embeddings = [emb.unsqueeze(0) for emb in single_entry_embeddings.values()]
+            token_embeddings = torch.cat(token_embeddings, dim=0)
+
+            mean_embedding = torch.mean(token_embeddings, dim=0)
+            mean_embeddings[sentence_idx] = mean_embedding
+
         if torch.cuda.is_available():
-            token_embeddings = token_embeddings.cuda()
+            mean_embeddings = mean_embeddings.cuda()
 
-        mean_embedding = torch.mean(token_embeddings, dim=0)
-
-        return mean_embedding
+        return mean_embeddings

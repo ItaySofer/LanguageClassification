@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from flair.embeddings import CharacterEmbeddings, FlairEmbeddings, BertEmbeddings, StackedEmbeddings
 from flair.data import Sentence
+from flair.models import TextClassifier
 
 
 class MultilingualTextEmbedder(nn.Module):
@@ -40,25 +41,35 @@ class MultilingualTextEmbedder(nn.Module):
         if torch.cuda.is_available():
             self.embedder.cuda()
 
-    def forward(self, text):
+    def forward(self, data):
         '''
-        Embeds the text with the configured NLP representations.
-        :param text: Input string, containing some semantic text.
-        text may be pre-tokenized or contain a whole phrase.
+        Embeds the data text with the configured NLP representations.
+        :param data: Either:
+        1) Input string, containing some semantic text.
+        2) Iterable of strings, each containing some semantic text.
+        Each entry in the data may be pre-tokenized or contain a whole phrase.
         When a whole phrase is given, it may get further tokenized by the embedder to produce embeddings.
         :return: A dict mapping token (string) -> single stacked representation (PyTorch tensor).
         Note: For pre-tokenized text, the embedder may break the tokens into even more sub-tokens before extracting
         embeddings (in which case, the dict will contain more than a single entry).
+        In the case of multiple data entries, the returned type is a list of mappings.
         '''
         # Wrap as a sentence and embed it
         # Text may get further tokenized here..
-        sentence = Sentence(text)
-        self.embedder.embed(sentence)
+        if isinstance(data, str):
+            sentences = [Sentence(data)]                     # Single entry
+        else:
+            sentences = [Sentence(entry) for entry in data]  # List of entries
 
-        # Return embedding representation per token
-        embeddings = {}
-        for token in sentence:
-            embeddings[token.text] = token.embedding
+        self.embedder.embed(sentences)
+
+        # For each entry: return embedding representation per token
+        embeddings = []
+        for sentence in sentences:
+            token_embeddings = {}
+            for token in sentence:
+                token_embeddings[token.text] = token.embedding
+            embeddings.append(token_embeddings)
         return embeddings
 
     def embedding_length(self):
