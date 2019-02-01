@@ -2,17 +2,17 @@ from urllib.parse import urlparse
 from abc import abstractmethod
 
 
-class SplitToWords(object):
+class SplitToWords:
     def __call__(self, tweet):
         return tweet.split(" ")
 
 
-class JoinWordsToSentence(object):
+class JoinWordsToSentence:
     def __call__(self, token_list):
         return ' '.join(token_list)
 
 
-class RemoveTokenBase(object):
+class RemoveTokenBase:
     def __call__(self, token_list):
         return [token for token in token_list if self.should_remove(token) is False]
 
@@ -47,7 +47,7 @@ class RemoveBlanks(RemoveTokenBase):
         return token == ""
 
 
-class CleanTokens(object):
+class CleanTokens:
     def __init__(self):
         pass
 
@@ -59,7 +59,7 @@ class CleanTokens(object):
         return ''.join(c for c in token if c.isalpha())
 
 
-class ToLowerCase(object):
+class ToLowerCase:
     def __init__(self):
         pass
 

@@ -2,7 +2,7 @@ import numpy as np
 import torch
 
 
-class ToOneHot(object):
+class ToOneHot:
     def __init__(self, language_names):
         self.language_names = np.array(language_names)
 
@@ -12,7 +12,7 @@ class ToOneHot(object):
         return torch.tensor(one_hot)
 
 
-class ToLabelIdTensor(object):
+class ToLabelIdTensor:
     def __init__(self, language_names):
         self.languages_mapping = {lang: np.array(i) for i, lang in enumerate(language_names)}
 
@@ -21,7 +21,7 @@ class ToLabelIdTensor(object):
         return torch.tensor(label_id)
 
 
-class ToCuda(object):
+class ToCuda:
     def __init__(self):
         pass
 
