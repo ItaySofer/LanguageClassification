@@ -26,5 +26,5 @@ class ToCuda(object):
         pass
 
     def __call__(self, language_label):
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda:" + str(torch.cuda.current_device()) if torch.cuda.is_available() else "cpu")
         return language_label.to(device=device, dtype=torch.int64)
