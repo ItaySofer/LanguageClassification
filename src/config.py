@@ -1,4 +1,5 @@
 import argparse
+import multiprocessing
 
 
 def _restricted_float(x, min_val=0.0, max_val=1.0):
@@ -45,11 +46,36 @@ def _parse_training_args(parser):
                        type=str,
                        dest='training_data_root',
                        help='Path to root of data folder')
+    group.add_argument('--trained_models_output_root',
+                       default='../trained_models',
+                       type=str,
+                       dest='training_trained_models_output_root',
+                       help='Path to root of where trained models are stored')
     group.add_argument('--train_test_split',
                        default=0.7,
                        type=_restricted_float,
                        dest='training_train_test_split',
                        help='Percentage of split between train / test data ~ [0.0, 1.0]')
+    group.add_argument('--epochs',
+                       default=50,
+                       type=int,
+                       dest='training_epochs',
+                       help='Number of epochs to use during training')
+    group.add_argument('--batch_size',
+                       default=16,
+                       type=int,
+                       dest='training_batch_size',
+                       help='Size of batch to use during training (# of tweet entries)')
+    group.add_argument('--num_workers',
+                       default=multiprocessing.cpu_count(),
+                       type=int,
+                       dest='training_num_workers',
+                       help='Number of worker sub-processes to spawn for train / test dataloaders')
+    group.add_argument('--learning_rate',
+                       default=1e-3,
+                       type=float,
+                       dest='training_learning_rate',
+                       help='Learning rate arg used b y the optimizer during training')
 
 
 def _build_args_hierarchy(args):
