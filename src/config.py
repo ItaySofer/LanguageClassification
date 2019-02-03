@@ -26,7 +26,20 @@ def _parse_general_args(parser):
                        default=['en', 'es', 'fr', 'in', 'it', 'nl', 'pt', 'tl'],
                        dest='general_langs',
                        help='Supported languages')
+    group.add_argument('--model_checkpoint',
+                       default='',
+                       dest='general_model_checkpoint',
+                       help='Path for *.pt of some saved model, used to resume training or for evaluation')
+    group.add_argument('--trainer_checkpoint',
+                       default='',
+                       dest='general_trainer_checkpoint',
+                       help='Path for *.pt of the trainer state, used to resume training')
 
+    # For example, to resume training where you left off, use:
+    # python main.py
+    # --train_test_mode train
+    # --model_checkpoint '../trained_models/last_model.pt'
+    # --trainer_checkpoint '../trained_models/last_trainer_state.pt'
 
 def _parse_model_args(parser):
     group = parser.add_argument_group('model')

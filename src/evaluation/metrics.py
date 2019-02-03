@@ -208,3 +208,12 @@ class ExperimentMetrics:
 
     def __iter__(self):
         return iter(self.statistics_per_epoch)
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['logger']
+        return state
+
+    def __setstate__(self, d):
+        self.__dict__ = d
+        self.logger = logging.getLogger('language_classifier')
