@@ -18,7 +18,7 @@ class ToLabelIdTensor:
 
     def __call__(self, language_label):
         label_id = self.languages_mapping[language_label]
-        return torch.tensor(label_id)
+        return torch.tensor(label_id, dtype=torch.int64)
 
 
 class ToCuda:
