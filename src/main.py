@@ -6,19 +6,20 @@ import os
 import logging
 
 
-def setup_logger():
+def setup_logger(log_level=logging.INFO):
     logger = logging.getLogger('language_classifier')
-    handler = logging.StreamHandler()
-    logger.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    logger.setLevel(log_level)
+    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # handler = logging.StreamHandler()
+    # handler.setFormatter(formatter)
+    # logger.addHandler(handler)
 
 
 setup_logger()
 config = parse_args()
 
 
+experiment_name = config['general']['experiment_name']
 tweets_data_handler = TweetsDataHandler(language_names=config['general']['langs'],
                                         data_root=config['training']['data_root'],
                                         train_test_split_perc=config['training']['train_test_split'])
@@ -26,7 +27,7 @@ tweets_data_handler = TweetsDataHandler(language_names=config['general']['langs'
 if config['general']['train_test_mode'] == 'train':
     model_builder = ModelBuilder(general_config=config['general'], model_config=config['model'])
     language_classifier = model_builder.build()
-    trainer = Trainer()
+    trainer = Trainer(experiment_name=experiment_name)
     trainer.start_training(model=language_classifier,
                            tweets_data_handler=tweets_data_handler,
                            training_config=config['training'])

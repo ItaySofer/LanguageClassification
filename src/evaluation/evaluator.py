@@ -46,7 +46,7 @@ class Evaluator:
 
                 prediction_probs = model(tweets_data)
 
-                # Calculate loss
+                # Calculate avg_loss
                 loss = criterion(prediction_probs, labels)
                 validation_loss += loss.item()
 

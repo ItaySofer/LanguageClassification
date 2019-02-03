@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from flair.embeddings import CharacterEmbeddings, FlairEmbeddings, BertEmbeddings, StackedEmbeddings
 from flair.data import Sentence
-from flair.models import TextClassifier
 
 
 class MultilingualTextEmbedder(nn.Module):

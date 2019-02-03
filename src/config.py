@@ -17,6 +17,10 @@ def _parse_general_args(parser):
                        default='train',
                        dest='general_train_test_mode',
                        help='Should the program run in train / test mode')
+    group.add_argument('--experiment_name',
+                       default='Default',
+                       dest='general_experiment_name',
+                       help='Unique identifier name for the experiment - used in plots & logs.')
     group.add_argument('--langs',
                        choices=['en', 'es', 'fr', 'in', 'it', 'nl', 'pt', 'tl'],
                        default=['en', 'es', 'fr', 'in', 'it', 'nl', 'pt', 'tl'],
