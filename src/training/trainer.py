@@ -10,6 +10,15 @@ from src.evaluation.plotter import Plotter
 
 class Trainer:
 
+    _CRITERIONS = {
+        'cross_entropy': nn.CrossEntropyLoss,
+    }
+
+    _OPTIMIZERS = {
+        'adam': optim.Adam,
+        'sgd': optim.SGD
+    }
+
     def __init__(self, experiment_name='Default'):
         self.logger = logging.getLogger('language_classifier')
         self.experiment_name = experiment_name
@@ -21,25 +30,21 @@ class Trainer:
         num_workers = training_config['num_workers']
         learning_rate = training_config['learning_rate']
         trained_models_output_root = training_config['trained_models_output_root']
-        print_every_n_minibatches = 200   # TODO: Move to config, along with optimizer and criterion
+        print_every_n_minibatches = training_config['log_rate']
 
         train_dataloader = tweets_data_handler.create_train_dataloader(batch_size=batch_size, num_workers=num_workers)
         test_dataloader = tweets_data_handler.create_test_dataloader(batch_size=batch_size, num_workers=num_workers)
 
-        criterion = nn.CrossEntropyLoss()
+        criterion_class = self._CRITERIONS[training_config['criterion']]
+        criterion = criterion_class()
 
         if trainer_state is None:
-            optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+            optimizer_class = self._OPTIMIZERS[training_config['optimizer']]
+            optimizer = optimizer_class(model.parameters(), lr=learning_rate)
             training_metrics = ExperimentMetrics(label_classes=tweets_data_handler.language_names, data_type='Training',
-                                                 metrics=['avg_loss', 'accuracy',
-                                                          'avg_precision', 'avg_recall', 'avg_f1',
-                                                          'confusion_matrix'])
+                                                 metrics=training_config['train_data_metrics'])
             test_metrics = ExperimentMetrics(label_classes=tweets_data_handler.language_names, data_type='Test',
-                                             metrics=['avg_loss', 'accuracy',
-                                                      'avg_precision', 'avg_recall', 'avg_f1',
-                                                      'precision_per_class', 'recall_per_class', 'f1_per_class',
-                                                      'confusion_matrix']
-                                             )
+                                             metrics=training_config['test_data_metrics'])
             first_epoch = 1
         else:
             optimizer = optim.Adam(model.parameters(), lr=learning_rate)

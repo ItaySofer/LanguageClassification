@@ -1,5 +1,6 @@
 import argparse
 import multiprocessing
+from itertools import combinations, chain
 
 
 def _restricted_float(x, min_val=0.0, max_val=1.0):
@@ -9,6 +10,13 @@ def _restricted_float(x, min_val=0.0, max_val=1.0):
         raise argparse.ArgumentTypeError("%r not in range [%r, %r]"%(x, min_val, max_val))
     return x
 
+def _allsubsets(choices):
+    """ Returns a list of all subset lists of the choices list"""
+    subsets = set()
+    for combo_len in range(1, len(choices) + 1):
+        subsets.update(chain(*[combinations(choices, ni) for ni in range(combo_len+1)]))
+    subsets.remove(())
+    return list(subsets)
 
 def _parse_general_args(parser):
     group = parser.add_argument_group('general')
@@ -24,6 +32,7 @@ def _parse_general_args(parser):
     group.add_argument('--langs',
                        choices=['en', 'es', 'fr', 'in', 'it', 'nl', 'pt', 'tl'],
                        default=['en', 'es', 'fr', 'in', 'it', 'nl', 'pt', 'tl'],
+                       nargs='+',
                        dest='general_langs',
                        help='Supported languages')
     group.add_argument('--model_checkpoint',
@@ -44,9 +53,10 @@ def _parse_general_args(parser):
 def _parse_model_args(parser):
     group = parser.add_argument_group('model')
 
-    group.add_argument('--embedder', nargs='+',
+    group.add_argument('--embedder',
                        default=['character', 'flair-fwd', 'flair-back'],
                        choices=['character', 'flair-fwd', 'flair-back', 'bert'],
+                       nargs='+',
                        dest='model_embedder',
                        help='Combination of NLP embeddings to use in the embedder block')
     group.add_argument('--aggregator',
@@ -88,11 +98,56 @@ def _parse_training_args(parser):
                        type=int,
                        dest='training_num_workers',
                        help='Number of worker sub-processes to spawn for train / test dataloaders')
+    group.add_argument('--criterion',
+                       default='cross_entropy',
+                       type=str,
+                       choices=['cross_entropy'],
+                       dest='training_criterion',
+                       help='Loss function to use for training the classifier')
+    group.add_argument('--optimizer',
+                       default='adam',
+                       type=str,
+                       choices=['adam', 'sgd'],
+                       dest='training_optimizer',
+                       help='Optimizer to use for fancy back-propagation')
     group.add_argument('--learning_rate',
                        default=1e-3,
                        type=float,
                        dest='training_learning_rate',
                        help='Learning rate arg used b y the optimizer during training')
+    group.add_argument('--log_rate',
+                       default=200,
+                       type=int,
+                       dest='training_log_rate',
+                       help='log_rate defines how many batches are processed between log dumps')
+    group.add_argument('--train_data_metrics',
+                       default=['avg_loss', 'accuracy',
+                                'avg_precision', 'avg_recall', 'avg_f1', 'confusion_matrix'],
+                       choices=[
+                           'avg_loss', 'accuracy', 'max_batch_loss',
+                           'avg_precision', 'avg_recall', 'avg_f1',
+                           'precision_per_class', 'recall_per_class', 'f1_per_class',
+                           'confusion_matrix'
+                       ],
+                       nargs='+',
+                       dest='training_train_data_metrics',
+                       help='Metrics to produce during training over training data')
+    group.add_argument('--test_data_metrics',
+                       default=[
+                           'avg_loss', 'accuracy',
+                           'avg_precision', 'avg_recall', 'avg_f1',
+                           'precision_per_class', 'recall_per_class', 'f1_per_class',
+                           'confusion_matrix'
+                       ],
+                       choices=[
+                           'avg_loss', 'accuracy', 'max_batch_loss',
+                           'avg_precision', 'avg_recall', 'avg_f1',
+                           'precision_per_class', 'recall_per_class', 'f1_per_class',
+                           'confusion_matrix'
+                       ],
+                       nargs='+',
+                       dest='training_test_data_metrics',
+                       help='Metrics to produce during validation over test data')
 
 
 def _build_args_hierarchy(args):
