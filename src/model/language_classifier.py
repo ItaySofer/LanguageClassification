@@ -12,10 +12,15 @@ class LanguageClassifier(nn.Module):
 
         self.projection = nn.Sequential(
             nn.Dropout(p=0.1),
-            nn.Linear(in_features=embedding_length, out_features=1000),
-            nn.ReLU(),
+            nn.Linear(in_features=embedding_length, out_features=2048),
+            nn.BatchNorm1d(num_features=2048),
+            nn.LeakyReLU(),
             nn.Dropout(p=0.1),
-            nn.Linear(in_features=1000, out_features=num_of_classes),
+            nn.Linear(in_features=2048, out_features=512),
+            nn.BatchNorm1d(num_features=512),
+            nn.LeakyReLU(),
+            nn.Dropout(p=0.1),
+            nn.Linear(in_features=512, out_features=num_of_classes)
         )
 
         # TODO: Handle config & architecture customization
