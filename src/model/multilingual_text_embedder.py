@@ -37,9 +37,6 @@ class MultilingualTextEmbedder(nn.Module):
 
         self.embedder = StackedEmbeddings(embeddings)
 
-        if torch.cuda.is_available():
-            self.embedder.cuda()
-
     def forward(self, data):
         '''
         Embeds the data text with the configured NLP representations.
