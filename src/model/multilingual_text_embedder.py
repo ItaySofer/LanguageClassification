@@ -62,9 +62,9 @@ class MultilingualTextEmbedder(nn.Module):
         # For each entry: return embedding representation per token
         embeddings = []
         for sentence in sentences:
-            token_embeddings = {}
+            token_embeddings = []
             for token in sentence:
-                token_embeddings[token.text] = token.embedding
+                token_embeddings.append(token.embedding)
             embeddings.append(token_embeddings)
         return embeddings
 

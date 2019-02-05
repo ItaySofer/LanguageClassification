@@ -12,7 +12,7 @@ class MeanAggregator(nn.Module):
 
     @staticmethod
     def _infer_embedding_size(embeddings):
-        return list(embeddings[0].values())[0].shape[0]
+        return embeddings[0][0].shape[0]
 
     def forward(self, embeddings):
         """
@@ -28,7 +28,7 @@ class MeanAggregator(nn.Module):
             mean_embeddings = mean_embeddings.cuda()
 
         for sentence_idx, single_entry_embeddings in enumerate(embeddings):
-            token_embeddings = [emb.unsqueeze(0) for emb in single_entry_embeddings.values()]
+            token_embeddings = [emb.unsqueeze(0) for emb in single_entry_embeddings]
             token_embeddings = torch.cat(token_embeddings, dim=0)
 
             mean_embedding = torch.mean(token_embeddings, dim=0)
