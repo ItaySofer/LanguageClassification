@@ -24,14 +24,14 @@ class MeanAggregator(nn.Module):
         embeddings_size = self._infer_embedding_size(embeddings)
         mean_embeddings = torch.zeros(len(embeddings), embeddings_size)
 
+        if torch.cuda.is_available():
+            mean_embeddings = mean_embeddings.cuda()
+
         for sentence_idx, single_entry_embeddings in enumerate(embeddings):
             token_embeddings = [emb.unsqueeze(0) for emb in single_entry_embeddings.values()]
             token_embeddings = torch.cat(token_embeddings, dim=0)
 
             mean_embedding = torch.mean(token_embeddings, dim=0)
             mean_embeddings[sentence_idx] = mean_embedding
-
-        if torch.cuda.is_available():
-            mean_embeddings = mean_embeddings.cuda()
 
         return mean_embeddings
