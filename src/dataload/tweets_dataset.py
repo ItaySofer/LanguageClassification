@@ -23,14 +23,12 @@ class TweetsDataset(Dataset):
         return len(self.tweets_frame)
 
     def __getitem__(self, idx):
-        original_tweet = self.tweets_frame.iloc[idx]['tweet_text']
-
-        tweet = original_tweet
+        tweet = self.tweets_frame.iloc[idx]['tweet_text']
         if self.tweet_transform:
             tweet = self.tweet_transform(tweet)
 
         # tweet is expected to be of basestring type, otherwise if batching is used a customized collate_fn should
         # be specified.
-        sample = {'original_tweet': original_tweet, 'tweet': tweet, 'label': self.label}
+        sample = {'tweet': tweet, 'label': self.label}
 
         return sample

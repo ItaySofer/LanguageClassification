@@ -43,14 +43,13 @@ class Evaluator:
 
         with torch.no_grad():
             for i, sample_batched in enumerate(dataloader):
-                original_tweets_data = sample_batched['original_tweet']
                 tweets_data = sample_batched['tweet']
                 labels = sample_batched['label']
 
                 pred = model(tweets_data)
                 loss = criterion(pred, labels)
 
-                self._add_to_misclassifications(labels, pred, original_tweets_data, tweets_data, language_names,
+                self._add_to_misclassifications(labels, pred, tweets_data, language_names,
                                                 misclassifications)
 
                 metrics.report_batch_results(epoch=1, preds=pred, labels=labels, loss=loss.item())
@@ -64,7 +63,7 @@ class Evaluator:
 
 
     @staticmethod
-    def _add_to_misclassifications(labels, pred, original_tweets_data, tweets_data, language_names,
+    def _add_to_misclassifications(labels, pred, tweets_data, language_names,
                                    wrong_predictions):
         pred_labels = torch.argmax(input=pred.data, dim=1)
 
@@ -73,7 +72,6 @@ class Evaluator:
                 true_language_symbol = language_names[labels[i]]
                 pred_language_symbol = language_names[pred_labels[i]]
                 wrong_predictions[true_language_symbol].append(  # intentionaly appending a dictionary for json format printing
-                    {"original tweet": original_tweets_data[i],
-                     "tweet": tweets_data[i],
+                    {"tweet": tweets_data[i],
                      "predicted": pred_language_symbol})
 
