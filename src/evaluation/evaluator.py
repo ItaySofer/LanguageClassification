@@ -1,67 +1,79 @@
 import logging
-import os
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
-import torch.optim as optim
+
+from src.evaluation.metrics import ExperimentMetrics
 
 
 class Evaluator:
+    _CRITERIONS = {
+        'cross_entropy': nn.CrossEntropyLoss,
+    }
 
     def __init__(self):
         self.logger = logging.getLogger('language_classifier')
 
-    def start_evaluation(self, train_dataset, test_dataset, model_path):
+    def start_evaluation(self, tweets_data_handler, model_path, training_config):
+        self.logger.info('Beginning evaluation')
+        self._evaluate(tweets_data_handler, model_path, training_config)
 
-        train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True, num_workers=16)
-        test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
+    def _evaluate(self, tweets_data_handler, model_path, training_config):
+        batch_size = training_config['batch_size']
+        num_workers = training_config['num_workers']
+        metrics = training_config['test_data_metrics']
+        criterion_type = training_config['criterion']
 
-        model = self.load_model(model_path)
-
+        model = torch.load(model_path)
+        model = model.eval()
         if torch.cuda.is_available():
             model = model.cuda()
 
-        model = model.eval()
-        criterion = nn.CrossEntropyLoss()
+        dataloader = tweets_data_handler.create_test_dataloader(batch_size=batch_size, num_workers=num_workers)
 
-        self.logger.info('Starting Evaluation on training data:')
-        self.run_evaluation_on_data(train_dataloader, model, criterion)
+        criterion_class = self._CRITERIONS[criterion_type]
+        criterion = criterion_class()
 
-        self.logger.info('Starting Evaluation on validation data:')
-        self.run_evaluation_on_data(test_dataloader, model, criterion)
+        test_metrics = ExperimentMetrics(label_classes=tweets_data_handler.language_names, data_type='Test',
+                                         metrics=metrics)
 
-    def run_evaluation_on_data(self, dataloader, model, criterion):
+        self.run_evaluation(dataloader, model, criterion, test_metrics, tweets_data_handler.language_names)
 
-        calc_accuracy = lambda correct_preds, total_preds: 100.0 * correct_preds / total_preds
+    def run_evaluation(self, dataloader, model, criterion, metrics, language_names):
+        misclassifications = {lang: [] for lang in language_names}
 
         with torch.no_grad():
-            validation_loss = 0
-            correct_predictions = 0
-            total_predictions = 0
-            print_every_n_minibatches = 3
-
             for i, sample_batched in enumerate(dataloader):
+                original_tweets_data = sample_batched['original_tweet']
                 tweets_data = sample_batched['tweet']
                 labels = sample_batched['label']
 
-                prediction_probs = model(tweets_data)
+                pred = model(tweets_data)
+                loss = criterion(pred, labels)
 
-                # Calculate avg_loss
-                loss = criterion(prediction_probs, labels)
-                validation_loss += loss.item()
+                self._add_to_misclassifications(labels, pred, original_tweets_data, tweets_data, language_names,
+                                                misclassifications)
 
-                # Calculate accuracy
-                predicted_labels = torch.argmax(input=prediction_probs.data, dim=1)
-                correct_predictions += (predicted_labels == labels).sum().item()
-                total_predictions += len(tweets_data)
+                metrics.report_batch_results(epoch=1, preds=pred, labels=labels, loss=loss.item())
 
-                if i % print_every_n_minibatches == print_every_n_minibatches - 1:
-                    accuracy = calc_accuracy(correct_predictions, total_predictions)
-                    self.logger.info('[%5d] accuracy so far: %.3f' % (i + 1, accuracy))
+            self.logger.info('Finished evaluation')
+            metrics.log_metrics(epoch=1)
 
-            accuracy = calc_accuracy(correct_predictions, total_predictions)
-            self.logger.info('Total validation accuracy: %.3f' % accuracy)
+            self.logger.info('Misclassifications in the form of { true language label : [misclassifications] } :')
+            print(misclassifications)
+            self.logger.info('The above line is in json format - copy it to a json viewer')
+
 
     @staticmethod
-    def load_model(model_path):
-        return torch.load(model_path)
+    def _add_to_misclassifications(labels, pred, original_tweets_data, tweets_data, language_names,
+                                   wrong_predictions):
+        pred_labels = torch.argmax(input=pred.data, dim=1)
+
+        for i in range(len(tweets_data)):
+            if pred_labels[i] != labels[i]:
+                true_language_symbol = language_names[labels[i]]
+                pred_language_symbol = language_names[pred_labels[i]]
+                wrong_predictions[true_language_symbol].append(  # intentionaly appending a dictionary for json format printing
+                    {"original tweet": original_tweets_data[i],
+                     "tweet": tweets_data[i],
+                     "predicted": pred_language_symbol})
+

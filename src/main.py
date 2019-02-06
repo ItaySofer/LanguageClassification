@@ -1,5 +1,6 @@
 from src.config import parse_args
 from src.dataload.tweets_data_handler import TweetsDataHandler
+from src.evaluation.evaluator import Evaluator
 from src.model.model_builder import ModelBuilder
 from src.training.trainer import Trainer
 import os
@@ -44,10 +45,10 @@ if config['general']['train_test_mode'] == 'train':
                                 trainer_state_path=trainer_path)
 
 elif config['general']['train_test_mode'] == 'test':
-    pass
-    # evaluator = Evaluator()
-    # base_path = '../trained_models'
-    # model_path = os.path.join(base_path, 'classifier_1_bkup.pt')
-    # evaluator.start_evaluation(train_data, test_data, model_path)
+    model_path = config['general']['model_checkpoint']
+    evaluator = Evaluator()
+    evaluator.start_evaluation(tweets_data_handler=tweets_data_handler,
+                               model_path=model_path,
+                               training_config=config['training'])
 else:
     raise ValueError('Invalid mode')
