@@ -27,9 +27,6 @@ class TweetsDataset(Dataset):
         if self.tweet_transform:
             tweet = self.tweet_transform(tweet)
 
-        if len(tweet) == 0:
-            tweet = self.language_name    # TODO: Bad mock. We should just remove empty entries..
-
         # tweet is expected to be of basestring type, otherwise if batching is used a customized collate_fn should
         # be specified.
         sample = {'tweet': tweet, 'label': self.label}
