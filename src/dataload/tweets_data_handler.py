@@ -12,34 +12,37 @@ class TweetsDataHandler:
     Data is loaded through this interface, and dataloaders should be created using its helper functions.
     """
 
-    def __init__(self, language_names, data_root, train_test_split_perc):
+    optional_transforms_dict = {
+        'remove_urls': RemoveURLs,
+        'remove_mentions': RemoveMentions,
+        'remove_response_token': RemoveResponseToken,
+        'remove_hashtags': RemoveHashtags,
+        'remove_names': RemoveNames,
+        'remove_non_alphachars': RemoveNonAlphaChars,
+        'to_lower_case': ToLowerCase
+    }
+
+    def __init__(self, language_names, training_config):
         """
         Creates a new handler instance.
         Creating a new TweetsDataHandler invokes the loading process of training & test datasets, which are cached
         for further uses.
         Therefore TweetsDataHandler is a heavyweight object.
         :param language_names: List of language initials whose data will be loaded.
-        :param data_root: Path of the root data folder, where the twitter *.csv files reside.
-        :param train_test_split_perc: Percentage of train / test data split (in range of 0.0-1.0 where the number
-        represents the train percentage).
+        :param training_config: training configuration containing data location, train-test split percent and tweets
+        transforms configs
         """
-        self.tweet_transform = transforms.Compose(
-            [SplitToWords(),
-             RemoveURLs(),
-             RemoveMentions(),
-             RemoveResponseToken(),
-             RemoveHashtags(),
-             RemoveNames(),
-             RemoveNonAlphaChars(),
-             RemoveBlanks(),
-             ToLowerCase(),
-             JoinWordsToSentence()])
+
+        self.tweet_transform = TweetsDataHandler._get_tweet_transforms(training_config)
 
         self.label_transform = transforms.Compose(
             [ToLabelIdTensor(language_names=language_names),
              ToCuda()])
 
         self.language_names = language_names
+
+        data_root = training_config['data_root']
+        train_test_split_perc = training_config['train_test_split']
         self.train_data, self.test_data = self._prepare_data(data_root=data_root,
                                                              train_percent=train_test_split_perc)
 
@@ -95,6 +98,32 @@ class TweetsDataHandler:
                                      collate_fn=self.filter_empty_collate_fn,
                                      num_workers=num_workers)
         return test_dataloader
+
+    @staticmethod
+    def _get_tweet_transforms(training_config):
+        tweet_transforms = [SplitToWords(),
+                            RemoveURLs(),
+                            RemoveMentions(),
+                            RemoveResponseToken(),
+                            RemoveHashtags(),
+                            RemoveNames(),
+                            RemoveNonAlphaChars(),
+                            RemoveBlanks(),
+                            ToLowerCase(),
+                            JoinWordsToSentence()]
+
+        tweet_transforms = TweetsDataHandler._remove_optional_transfoms(tweet_transforms, training_config)
+
+        return transforms.Compose(tweet_transforms)
+
+    @staticmethod
+    def _remove_optional_transfoms(tweet_transforms, training_config):
+        transfoms_to_remove = []
+        for transform_name, transform_type in TweetsDataHandler.optional_transforms_dict.items():
+            if transform_name not in training_config['tweet_transforms']:
+                transfoms_to_remove.append(transform_type)
+
+        return [transform for transform in tweet_transforms if type(transform) not in transfoms_to_remove]
 
     @staticmethod
     def filter_empty_collate_fn(batch):

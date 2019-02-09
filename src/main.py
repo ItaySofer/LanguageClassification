@@ -22,8 +22,7 @@ config = parse_args()
 
 experiment_name = config['general']['experiment_name']
 tweets_data_handler = TweetsDataHandler(language_names=config['general']['langs'],
-                                        data_root=config['training']['data_root'],
-                                        train_test_split_perc=config['training']['train_test_split'])
+                                        training_config=config['training'])
 
 if config['general']['train_test_mode'] == 'train':
     if config['general']['model_checkpoint'] == '' or config['general']['trainer_checkpoint'] == '':

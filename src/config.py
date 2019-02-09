@@ -148,6 +148,14 @@ def _parse_training_args(parser):
                        nargs='+',
                        dest='training_test_data_metrics',
                        help='Metrics to produce during validation over test data')
+    group.add_argument('--tweet_transforms',
+                       default=['remove_urls', 'remove_mentions', 'remove_response_token', 'remove_hashtags',
+                                'remove_names', 'remove_non_alphachars'],
+                       choices=['remove_urls', 'remove_mentions', 'remove_response_token', 'remove_hashtags',
+                                'remove_names', 'remove_non_alphachars', 'to_lower_case'],
+                       nargs='+',
+                       dest='training_tweet_transforms',
+                       help='Transforms to apply on tweets')
 
 
 def _build_args_hierarchy(args):
