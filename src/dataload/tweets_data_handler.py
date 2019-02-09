@@ -30,7 +30,7 @@ class TweetsDataHandler:
              RemoveResponseToken(),
              RemoveHashtags(),
              RemoveNames(),
-             CleanTokens(),
+             RemoveNonAlphaChars(),
              RemoveBlanks(),
              ToLowerCase(),
              JoinWordsToSentence()])

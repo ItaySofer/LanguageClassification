@@ -72,12 +72,12 @@ class RemoveNames:
         return len(token) > 0 and token[-1] in stop_chars
 
 
-class CleanTokens:
+class RemoveNonAlphaChars:
     def __init__(self):
         pass
 
     def __call__(self, token_list):
-        return [CleanTokens.clean(token) for token in token_list]
+        return [RemoveNonAlphaChars.clean(token) for token in token_list]
 
     @staticmethod
     def clean(token):
