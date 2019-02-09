@@ -156,6 +156,11 @@ def _parse_training_args(parser):
                        nargs='+',
                        dest='training_tweet_transforms',
                        help='Transforms to apply on tweets')
+    group.add_argument('--pass_original_tweet',
+                       default=False,
+                       type=str2bool,
+                       dest='training_pass_original_tweet',
+                       help='indicates if Tweets Dataset should also pass the original tweet (for debugging)')
 
 
 def _build_args_hierarchy(args):
@@ -189,3 +194,7 @@ def parse_args():
     args = parser.parse_args()
     args = _build_args_hierarchy(args)
     return args
+
+
+def str2bool(s):
+    return bool(s)

@@ -41,12 +41,9 @@ class TweetsDataHandler:
 
         self.language_names = language_names
 
-        data_root = training_config['data_root']
-        train_test_split_perc = training_config['train_test_split']
-        self.train_data, self.test_data = self._prepare_data(data_root=data_root,
-                                                             train_percent=train_test_split_perc)
+        self.train_data, self.test_data = self._prepare_data(training_config)
 
-    def _prepare_data(self, data_root, train_percent):
+    def _prepare_data(self, training_config):
         """
         This method:
         1) Loads each of the language tweet-datasets.
@@ -56,11 +53,16 @@ class TweetsDataHandler:
         :param train_test_split_perc: Percentage of train / test data split (in range of 0.0-1.0 where the number
         :return: Train & test Datasets (ConcatDataset of multiple subsets of TweetsDataset)
         """
+        data_root = training_config['data_root']
+        train_percent = training_config['train_test_split']
+        pass_original_tweet = training_config['pass_original_tweet']
+
         train_datasets = []
         test_datasets = []
         for language_name in self.language_names:
             dataset = TweetsDataset(root_dir=data_root, language_name=language_name,
-                                    tweet_transform=self.tweet_transform, label_transform=self.label_transform)
+                                    tweet_transform=self.tweet_transform, label_transform=self.label_transform,
+                                    pass_original_tweet=pass_original_tweet)
 
             train_size = int(train_percent * len(dataset))
             train_dataset = Subset(dataset, range(0, train_size))
