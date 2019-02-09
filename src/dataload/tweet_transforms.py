@@ -47,6 +47,31 @@ class RemoveBlanks(RemoveTokenBase):
         return token == ""
 
 
+class RemoveNames:
+    def __call__(self, token_list):
+        return [token for i, token in enumerate(token_list) if self.should_remove(token_list, i) is False]
+
+    @staticmethod
+    def should_remove(token_list, token_location):
+        token = token_list[token_location]
+        return RemoveNames.starts_with_upper(token) and \
+               RemoveNames.is_first_token_in_sentence(token_list, token_location) is False
+
+    @staticmethod
+    def starts_with_upper(token):
+        return len(token) > 0 and token[0].isupper()
+
+    @staticmethod
+    def is_first_token_in_sentence(token_list, token_location):
+        return token_location == 0 or RemoveNames.is_last_token_in_sentence(token_list, token_location - 1)
+
+    @staticmethod
+    def is_last_token_in_sentence(token_list, token_location):
+        stop_chars = ['.', '?', '!']
+        token = token_list[token_location]
+        return len(token) > 0 and token[-1] in stop_chars
+
+
 class CleanTokens:
     def __init__(self):
         pass

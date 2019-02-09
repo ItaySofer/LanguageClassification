@@ -29,6 +29,7 @@ class TweetsDataHandler:
              RemoveMentions(),
              RemoveResponseToken(),
              RemoveHashtags(),
+             RemoveNames(),
              CleanTokens(),
              RemoveBlanks(),
              ToLowerCase(),
