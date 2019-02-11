@@ -80,11 +80,18 @@ class TweetsDataHandler:
         :param num_workers: Number of sub-processes to employ for pre-fetch.
         :return: Pytorch DataLoader that wraps the training data.
         """
-        train_dataloader = DataLoader(self.train_data,
-                                      batch_size=batch_size,
-                                      shuffle=True,
-                                      collate_fn=self.filter_empty_collate_fn,
-                                      num_workers=num_workers)
+        if batch_size == np.inf:
+            train_dataloader = DataLoader(self.train_data,
+                                          batch_size=len(self.train_data),
+                                          shuffle=True,
+                                          collate_fn=self.filter_empty_collate_fn,
+                                          num_workers=num_workers)
+        else:
+            train_dataloader = DataLoader(self.train_data,
+                                          batch_size=batch_size,
+                                          shuffle=True,
+                                          collate_fn=self.filter_empty_collate_fn,
+                                          num_workers=num_workers)
         return train_dataloader
 
     def create_test_dataloader(self, batch_size, num_workers):
@@ -94,11 +101,20 @@ class TweetsDataHandler:
         :param num_workers: Number of sub-processes to employ for pre-fetch.
         :return: Pytorch DataLoader that wraps the test data.
         """
-        test_dataloader = DataLoader(self.test_data,
-                                     batch_size=batch_size,
-                                     shuffle=False,
-                                     collate_fn=self.filter_empty_collate_fn,
-                                     num_workers=num_workers)
+        if batch_size == np.inf:
+            test_dataloader = DataLoader(self.test_data,
+                                         batch_size=len(self.test_data),
+                                         shuffle=False,
+                                         collate_fn=self.filter_empty_collate_fn,
+                                         num_workers=num_workers)
+        else:
+
+            test_dataloader = DataLoader(self.test_data,
+                                         batch_size=batch_size,
+                                         shuffle=False,
+                                         collate_fn=self.filter_empty_collate_fn,
+                                         num_workers=num_workers)
+
         return test_dataloader
 
     @staticmethod
