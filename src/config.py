@@ -70,12 +70,12 @@ def _parse_model_args(parser):
 def _parse_training_args(parser):
     group = parser.add_argument_group('training')
     group.add_argument('--data_root',
-                       default='/home/lior/PycharmProjects/LanguageClassification/data',
+                       default='../data',
                        type=str,
                        dest='training_data_root',
                        help='Path to root of data folder')
     group.add_argument('--trained_models_output_root',
-                       default='/home/lior/PycharmProjects/LanguageClassification/trained_models',
+                       default='../trained_models',
                        type=str,
                        dest='training_trained_models_output_root',
                        help='Path to root of where trained models are stored')
