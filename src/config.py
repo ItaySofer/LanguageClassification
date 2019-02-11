@@ -54,8 +54,9 @@ def _parse_model_args(parser):
     group = parser.add_argument_group('model')
 
     group.add_argument('--embedder',
-                       default=['character', 'flair-fwd', 'flair-back'],
-                       choices=['character', 'flair-fwd', 'flair-back', 'bert'],
+                       # default=['character', 'flair-fwd', 'flair-back'],
+                       default=['tfidf'],
+                       choices=['character', 'flair-fwd', 'flair-back', 'bert', 'tfidf'],
                        nargs='+',
                        dest='model_embedder',
                        help='Combination of NLP embeddings to use in the embedder block')
@@ -69,12 +70,12 @@ def _parse_model_args(parser):
 def _parse_training_args(parser):
     group = parser.add_argument_group('training')
     group.add_argument('--data_root',
-                       default='../data',
+                       default='/home/lior/PycharmProjects/LanguageClassification/data',
                        type=str,
                        dest='training_data_root',
                        help='Path to root of data folder')
     group.add_argument('--trained_models_output_root',
-                       default='../trained_models',
+                       default='/home/lior/PycharmProjects/LanguageClassification/trained_models',
                        type=str,
                        dest='training_trained_models_output_root',
                        help='Path to root of where trained models are stored')
@@ -95,6 +96,7 @@ def _parse_training_args(parser):
                        help='Size of batch to use during training (# of tweet entries)')
     group.add_argument('--num_workers',
                        default=multiprocessing.cpu_count(),
+                       # default=0,
                        type=int,
                        dest='training_num_workers',
                        help='Number of worker sub-processes to spawn for train / test dataloaders')

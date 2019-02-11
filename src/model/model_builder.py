@@ -41,7 +41,8 @@ class ModelBuilder:
             use_character_embeddings=('character' in model_config['embedder']),
             use_flair_forward_embeddings=('flair-fwd' in model_config['embedder']),
             use_flair_backward_embeddings=('flair-back' in model_config['embedder']),
-            use_bert_embeddings=('bert' in model_config['embedder'])
+            use_bert_embeddings=('bert' in model_config['embedder']),
+            use_tfidf_embeddings=('tfidf' in model_config['embedder'])
         )
 
         return embedder

@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from flair.embeddings import CharacterEmbeddings, FlairEmbeddings, BertEmbeddings, StackedEmbeddings
 from flair.data import Sentence
+from src.model.TfidfEmbedder import TfIdfEmbedder
 
 
 class MultilingualTextEmbedder(nn.Module):
@@ -16,7 +17,8 @@ class MultilingualTextEmbedder(nn.Module):
                  use_character_embeddings=True,
                  use_flair_forward_embeddings=True,
                  use_flair_backward_embeddings=True,
-                 use_bert_embeddings=False):
+                 use_bert_embeddings=False,
+                 use_tfidf_embeddings=False):
         """
         Creates a new instance of the embedder block.
         :param use_character_embeddings: Whether character embeddings should be extracted.
@@ -34,8 +36,10 @@ class MultilingualTextEmbedder(nn.Module):
             embeddings.append(FlairEmbeddings('multi-backward'))
         if use_bert_embeddings:
             embeddings.append(BertEmbeddings('bert-base-multilingual-cased'))
-
+        if use_tfidf_embeddings:
+            embeddings.append(TfIdfEmbedder())
         self.embedder = StackedEmbeddings(embeddings)
+
 
     def forward(self, data):
         '''
