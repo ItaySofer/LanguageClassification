@@ -49,7 +49,7 @@ torchvision==0.2.1
 tornado==5.1.1
 tqdm==4.26.0
 typing==3.6.4
-urllib3==1.24.1
+urllib3==1.24.2
 visdom==0.1.8.8
 websocket-client==0.54.0
 wrapt==1.11.1
