@@ -21,7 +21,7 @@ mkl-fft==1.0.10
 mkl-random==1.0.2
 mpld3==0.3
 networkx==2.2
-numpy==1.15.4
+numpy==1.22.0
 olefile==0.46
 pandas==0.24.0
 Pillow==5.4.1
